@@ -371,13 +371,16 @@ class Status {
         println("check csvFile")
         println(csvFile)
 
+        println("create before")
         // ファイルが存在しない場合、作成する
         println("ファイルが存在")
         println(csvFile.exists())
         if (!csvFile.exists()) {
+            println("create")
             createCsv(csvFile)
         }
 
+        println("create after")
         val syuzoList = mutableListOf<Syuzo>()
         if (csvFile.exists()) {
             csvFile.forEachLine { line ->
@@ -441,6 +444,7 @@ class Status {
         syuzoList.forEach {
             println("Syuzo item: ${it.name}, visited: ${it.visited}")
         }
+
 
         try {
             // ディレクトリが存在しない場合、作成する

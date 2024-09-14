@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.compose.material3.Surface
+
 
 class MainScreen {
 
@@ -38,7 +40,6 @@ class MainScreen {
                 .background(backgroundColor.value)  // 動的に背景色を設定
         ) {
             val iconColor = if (backgroundColor.value == Color.White) Color.Black else Color.White
-            val a = 1
             // メインコンテンツ
             Box(
                 modifier = Modifier
@@ -49,23 +50,29 @@ class MainScreen {
                 contentState.value()  // 動的に変更されるコンテンツを表示
             }
 
-            // フッター
-            Footer(navController, iconColor) { button ->
-                when (button) {
-                    "map" -> {
-                        contentState.value = { Map().Content(navController) }
-                        backgroundColor.value = Color.White
-                    }
-                    "adviser" -> {
-                        contentState.value = { Adviser().Content() }
-                        backgroundColor.value = Color.Black
-                    }
-                    "status" -> {
-                        contentState.value = { Status().Content(navController) }
-                        backgroundColor.value = Color.White
+            Surface(
+                shadowElevation = 10.dp, // 影の大きさを指定
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // フッター
+                Footer(navController, iconColor) { button ->
+                    when (button) {
+                        "map" -> {
+                            contentState.value = { Map().Content(navController) }
+                            backgroundColor.value = Color.White
+                        }
+                        "adviser" -> {
+                            contentState.value = { Adviser().Content() }
+                            backgroundColor.value = Color.White
+                        }
+                        "status" -> {
+                            contentState.value = { Status().Content(navController) }
+                            backgroundColor.value = Color.White
+                        }
                     }
                 }
             }
+
         }
     }
 

@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.delay
+import org.jetbrains.annotations.ApiStatus.NonExtendable
+import java.io.File
 
 class Adviser {
 
@@ -28,15 +30,27 @@ class Adviser {
         var displayedText by remember { mutableStateOf("") }
         var fullText by remember { mutableStateOf("") } // ここに返答を返す
 
-        // 非同期でChatGPTのレスポンスを取得し、状態を更新
-        LaunchedEffect(Unit) {
-            val dSumList =  listOf(1,0,5,3,0,1,2,2,1)
-            chatGptAccess.getAdviserResponse(dSumList) { responseText ->
-                // ChatGPTの返答を受け取ったときに`fullText`を更新
-                println(responseText)
-                fullText = responseText // 動的に変更
+        val syuzoDataStr: String = loadOrCreateCsv()
+
+        if (syuzoDataStr == "None") {
+            fullText = "僕が君の旅のお供を務めるスパにゃんだにゃん。よろしくにゃん〜"
+        }
+        else {
+            //syuzoListの中身をStringに変換
+            // 非同期でChatGPTのレスポンスを取得し、状態を更新
+            LaunchedEffect(Unit) {
+                //val dSumList =  listOf(1,0,5,3,0,1,2,2,1)
+                chatGptAccess.getAdviserResponse(syuzoDataStr) { responseText ->
+                    // ChatGPTの返答を受け取ったときに`fullText`を更新
+                    println(responseText)
+                    fullText = responseText // 動的に変更
+                }
             }
         }
+
+
+
+
 
         // テキストを一文字ずつ表示する
         LaunchedEffect(fullText) {
@@ -109,4 +123,48 @@ class Adviser {
     fun makePrompt() {
 
     }
+
+    // CSVを読み込むか、なければ作成する関数
+    private fun loadOrCreateCsv(): String {
+        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo.csv"
+        val csvFile = File(filePath)
+
+        // ファイルが存在しない場合、"None"を返す
+        if (!csvFile.exists()) {
+            return "None"
+        }
+
+        // CSVファイルを読み込み、SyuzoMiniのリストに変換
+        val syuzoList = mutableListOf<SyuzoMini>()
+        csvFile.forEachLine { line ->
+            val parts = line.split(",")
+            if (parts.size >= 7) {
+                val name = parts[1]
+                val representativeSake = parts[2]
+                val visited = parts[5].trim().toIntOrNull() == 1
+                val evaluation = parts[6].trim().toIntOrNull() ?: 3
+
+                syuzoList.add(
+                    SyuzoMini(name, representativeSake, visited, evaluation)
+                )
+            }
+        }
+
+        // リストの全ての要素を一つの文字列に整形して結合
+        val syuzoDataStr = syuzoList.joinToString(separator = "\n") { syuzo ->
+            // 各要素をフォーマット
+            val visitedStr = if (syuzo.visited) "Visited" else "Not Visited"
+            "Name: ${syuzo.name}, Sake: ${syuzo.representativeSake}, Status: $visitedStr, Evaluation: ${syuzo.evaluation}"
+        }
+
+        return syuzoDataStr
+    }
 }
+
+// Syuzoデータクラス
+data class SyuzoMini(
+    val name: String,
+    val representativeSake: String,
+    var visited: Boolean,
+    var evaluation: Int,
+)

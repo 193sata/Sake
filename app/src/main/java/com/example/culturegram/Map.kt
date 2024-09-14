@@ -36,7 +36,7 @@ class Map {
   private var sakeBreweries: MutableList<SakeBrewery> = mutableListOf()
   private var heritagesInside: MutableList<SakeBrewery> = mutableListOf()
   private var mapPins = MapPins()
-  private var allowedR = 100.0
+  private var allowedR = 10000.0
 
   @Composable
   fun Content(navController: NavController) {

@@ -57,15 +57,19 @@ class Status {
                     .fillMaxSize()
                     .padding(top = 16.dp)
             ) {
+
                 // 達成度のドーナツ型グラフ
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
+//                            .fillMaxWidth()
                         .padding(16.dp)
                         .height(150.dp)
                 ) {
-                    DonutChart(achievementRatio, visitedCount, totalCount)
+                    Row(){
+                        DonutChart(achievementRatio, visitedCount, totalCount)
+                        Adviser().Content()
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

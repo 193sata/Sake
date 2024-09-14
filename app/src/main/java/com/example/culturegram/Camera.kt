@@ -42,7 +42,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import java.io.FileOutputStream
 
 class CameraScreen {
-
     @Composable
     fun Content(s: String, navController: NavController) {
         val context = LocalContext.current

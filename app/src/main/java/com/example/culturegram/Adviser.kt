@@ -58,7 +58,7 @@ class Adviser {
                     .weight(7f) // Takes up 70% of the space
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.sakespanyan),
+                    painter = painterResource(id = R.drawable.sakespanyan2),
                     contentDescription = "Spanyan Image",
                     modifier = Modifier.fillMaxSize(), // Adjust the size as needed
                     contentScale = ContentScale.Crop    // Adjust content scaling as needed

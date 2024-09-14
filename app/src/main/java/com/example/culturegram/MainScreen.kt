@@ -102,7 +102,8 @@ class MainScreen {
             }
 
             // 最後は消す
-            IconButton(onClick = {
+            //デバッグ用
+            /*IconButton(onClick = {
                 navController.navigate("adviser")
             }) {
                 Icon(
@@ -110,7 +111,7 @@ class MainScreen {
                     contentDescription = "Status Icon",
                     tint = iconColor
                 )
-            }
+            }*/
         }
     }
 }

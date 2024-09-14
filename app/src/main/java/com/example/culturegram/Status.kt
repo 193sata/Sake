@@ -369,11 +369,14 @@ class Status {
         val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo.csv"
         val csvFile = File(filePath)
 
+        println("create before")
         // ファイルが存在しない場合、作成する
         if (!csvFile.exists()) {
+            println("create")
             createCsv(csvFile)
         }
 
+        println("create after")
         val syuzoList = mutableListOf<Syuzo>()
         if (csvFile.exists()) {
             csvFile.forEachLine { line ->
@@ -432,6 +435,7 @@ class Status {
         syuzoList.forEach {
             println("Syuzo item: ${it.name}, visited: ${it.visited}")
         }
+
 
         try {
             // ディレクトリが存在しない場合、作成する

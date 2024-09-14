@@ -66,14 +66,11 @@ class Status {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-//                            .fillMaxWidth()
+                        .fillMaxWidth()
                         .padding(16.dp)
-                        .height(250.dp)
+                        .height(150.dp)
                 ) {
-                    Row(){
-                        DonutChart(achievementRatio, visitedCount, totalCount)
-                        Adviser().Content()
-                    }
+                    DonutChart(achievementRatio, visitedCount, totalCount)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

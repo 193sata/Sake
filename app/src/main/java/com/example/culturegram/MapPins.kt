@@ -83,7 +83,8 @@ class MapPins {
                 val sakeName = tokens.getOrNull(sakeNameIndex)
                 val latitude = tokens.getOrNull(latitudeIndex)?.toDoubleOrNull()
                 val longitude = tokens.getOrNull(longitudeIndex)?.toDoubleOrNull()
-                val yet = tokens.getOrNull(yetIndex)?.toIntOrNull()
+                val yet = tokens.getOrNull(yetIndex)?.toBoolean()
+
 
                 // Parse attributes
                 val attributes = attrIndices.map { index ->

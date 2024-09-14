@@ -33,7 +33,7 @@ import java.io.IOException
 
 class Map {
   var currentLocation by mutableStateOf(LatLng(32.81449335495487, 130.72729505562057)) // デフォルトの位置（熊本）
-  private var heritages: MutableList<SakeBrewery> = mutableListOf()
+  private var sakeBreweries: MutableList<SakeBrewery> = mutableListOf()
   private var heritagesInside: MutableList<SakeBrewery> = mutableListOf()
   private var mapPins = MapPins()
   private var allowedR = 100000.0
@@ -57,7 +57,7 @@ class Map {
     mapPins.readCsvFile(context)
 
     try {
-      heritages = mapPins.getHeritages() // 全て入るように
+      sakeBreweries = mapPins.getSakeBreweries() // 全て入るように
       heritagesInside = mapPins.getHeritagesInside(allowedR)
     } catch (e: IOException) {
       e.printStackTrace()
@@ -96,21 +96,21 @@ class Map {
           )
 
           // 遺産のピンを立てる
-          heritages.forEach { heritage ->
-            val isInside = heritagesInside.contains(heritage) // heritagesInsideに含まれているか確認
+          sakeBreweries.forEach { sakeBrewery ->
+            val isInside = heritagesInside.contains(sakeBrewery) // heritagesInsideに含まれているか確認
 
             Marker(
-              state = MarkerState(position = LatLng(heritage.latitude, heritage.longitude)),
-              title = heritage.name, // デフォルトのタイトル（カスタムUIで表示するためここでの自動表示は抑制）
+              state = MarkerState(position = LatLng(sakeBrewery.latitude, sakeBrewery.longitude)),
+              title = sakeBrewery.breweryName, // デフォルトのタイトル（カスタムUIで表示するためここでの自動表示は抑制）
               icon = when {
                 isInside -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)  // heritagesInsideに含まれている場合は黄色
-                heritage.yet == 1 -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)  // 行った場所
+                sakeBrewery.yet == 1 -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)  // 行った場所
                 else -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)  // 行ってない場所
               },
               onClick = {
                 // クリック時にカスタムUIを表示する
                 if (isInside) {
-                  selectedHeritage = heritage // カスタムUIで表示するための遺産を設定
+                  selectedHeritage = sakeBrewery // カスタムUIで表示するための遺産を設定
                 } else {
                   selectedHeritage = null // クリックされた遺産がisInsideでない場合は選択をリセット
                 }
@@ -122,7 +122,7 @@ class Map {
       }
 
       // カメラアイコンを表示する
-      selectedHeritage?.let { heritage ->
+      selectedHeritage?.let { sakeBrewry ->
         Box(
           modifier = Modifier
             .align(Alignment.BottomCenter)  // 画面の中央下方に配置
@@ -139,7 +139,7 @@ class Map {
           IconButton(
             onClick = {
               // カメラアイコンが押されたら"camera"画面へ遷移
-              navController.navigate("camera/${heritage.name}")
+              navController.navigate("camera/${sakeBrewry.breweryName}")
             },
             modifier = Modifier.size(100.dp)  // アイコンボタンのサイズ
           ) {

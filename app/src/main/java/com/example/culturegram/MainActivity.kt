@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.culturegram.ui.theme.CultureGramTheme
 import java.io.File
+
 // test_sata
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,8 +23,6 @@ class MainActivity : ComponentActivity() {
             CultureGramTheme {
                 val navController = rememberNavController()
                 var selectedImage by remember { mutableStateOf<String?>(null) }
-
-                val chatGptAccess = ChatGptApiIO()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(

@@ -1,6 +1,7 @@
 package com.example.culturegram
 
 import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -10,14 +11,35 @@ import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import kotlinx.coroutines.*//APIとの非同期通信に必要
 
 class ChatGptApiIO {
     private val apiKey = BuildConfig.CHATGPT_API_KEY // ここにOpenAIのAPIキーを入力
     private val url = "https://api.openai.com/v1/chat/completions"
     private val client = OkHttpClient()// OkHttpClientを使用してネットワーク通信を行う
 
+    /*
+    //使い方
+    val chatGptAccess = ChatGptApiIO()
+    chatGptAccess.getResponse("Hello!") { responseText ->
+        // ここでChatGPTの返答を受け取る
+        println(responseText)
+    }
+    */
+
+    public fun getResponse(prompt: String, callback: (String) -> Unit) {
+        val coroutineScope = CoroutineScope(Dispatchers.Main) // メインスレッドでコルーチンを起動
+        coroutineScope.launch {
+            // `getChatGptResponse` を非同期で呼び出し、その結果をcallbackに渡す
+            val result = withContext(Dispatchers.IO) {
+                getChatGptResponse(prompt)
+            }
+            callback(result) // 結果をcallbackに渡す
+        }
+    }
+
     //プロンプトを受け取って，返す
-    suspend fun getChatGptResponse(prompt: String): String {
+    private suspend fun getChatGptResponse(prompt: String): String {
         // JSONリクエストボディ
         val jsonBody = """
         {

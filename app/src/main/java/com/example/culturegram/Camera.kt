@@ -49,7 +49,7 @@ class CameraScreen {
         var hasCameraPermission by remember { mutableStateOf(false) }
 
         // ランダムでキャラクターを選択
-        val characterResIds = listOf(
+        /*val characterResIds = listOf(
             R.drawable.spanyan1,
             R.drawable.spanyan2,
             R.drawable.spanyan3,
@@ -57,7 +57,7 @@ class CameraScreen {
             R.drawable.spanyan5,
             R.drawable.spanyan6,
 //            R.drawable.ryokochan
-        )
+        )*/
         //val selectedCharacter = remember { characterResIds.random() }
 
         // キャラクター表示/非表示を管理する状態

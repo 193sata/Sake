@@ -38,7 +38,7 @@ class MainScreen {
                 .background(backgroundColor.value)  // 動的に背景色を設定
         ) {
             val iconColor = if (backgroundColor.value == Color.White) Color.Black else Color.White
-
+            val a = 1
             // メインコンテンツ
             Box(
                 modifier = Modifier
@@ -56,8 +56,8 @@ class MainScreen {
                         contentState.value = { Map().Content(navController) }
                         backgroundColor.value = Color.White
                     }
-                    "shorts" -> {
-                        contentState.value = { Shorts().Content() }
+                    "adviser" -> {
+                        contentState.value = { Adviser().Content() }
                         backgroundColor.value = Color.Black
                     }
                     "status" -> {
@@ -85,9 +85,9 @@ class MainScreen {
                 )
             }
 
-            IconButton(onClick = { onButtonClick("shorts") }) {
+            IconButton(onClick = { onButtonClick("adviser") }) {
                 Icon(
-                    imageVector = Icons.Default.Folder,
+                    imageVector = Icons.Default.Person,
                     contentDescription = "Shorts Icon",
                     tint = iconColor
                 )
@@ -95,7 +95,7 @@ class MainScreen {
 
             IconButton(onClick = { onButtonClick("status") }) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    imageVector = Icons.Default.Folder,
                     contentDescription = "Status Icon",
                     tint = iconColor
                 )

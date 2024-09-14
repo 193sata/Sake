@@ -3,13 +3,14 @@ package com.example.culturegram
 import android.content.Context
 import android.util.Log
 import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
 import java.io.InputStreamReader
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 class MapPins {
-    //private var heritages: MutableList<SakeBrewery> = mutableListOf()
     private var sakeBreweries: MutableList<SakeBrewery> = mutableListOf()
     private var userLatitude: Double = 0.0
     private var userLongitude: Double = 0.0
@@ -47,31 +48,21 @@ class MapPins {
 
     fun readCsvFile(context: Context) {
         try {
-            val inputStream = context.assets.open("syuzo_full_utf8.csv")
-            val reader = BufferedReader(InputStreamReader(inputStream))
+            // syuzo.csvファイルを読み込む
+            val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo.csv"
+            val csvFile = File(filePath)
+            val reader = BufferedReader(FileReader(csvFile))
             val header = reader.readLine()
             val headerTokens = header.split(",")
 
             // Get the indices of each column in the CSV
-            val idIndex = headerTokens.indexOf("ID")
-            val breweryNameIndex = headerTokens.indexOf("製造所名")
-            val sakeNameIndex = headerTokens.indexOf("代表酒")
-            val latitudeIndex = headerTokens.indexOf("緯度")
-            val longitudeIndex = headerTokens.indexOf("経度")
-            val yetIndex = headerTokens.indexOf("既訪")
-
-            // Indices for the attributes (清, 連, 単, ビ, 果, ウ, ス, リ, 他)
-            val attrIndices = listOf(
-                headerTokens.indexOf("清"),
-                headerTokens.indexOf("連"),
-                headerTokens.indexOf("単"),
-                headerTokens.indexOf("ビ"),
-                headerTokens.indexOf("果"),
-                headerTokens.indexOf("ウ"),
-                headerTokens.indexOf("ス"),
-                headerTokens.indexOf("リ"),
-                headerTokens.indexOf("他")
-            )
+            val idIndex = 0
+            val breweryNameIndex = 1
+            val sakeNameIndex = 2
+            val latitudeIndex = 3
+            val longitudeIndex = 4
+            val visitedIndex = 5
+            val evaluationIndex = 6
 
             var line: String?
             while (reader.readLine().also { line = it } != null) {
@@ -83,16 +74,11 @@ class MapPins {
                 val sakeName = tokens.getOrNull(sakeNameIndex)
                 val latitude = tokens.getOrNull(latitudeIndex)?.toDoubleOrNull()
                 val longitude = tokens.getOrNull(longitudeIndex)?.toDoubleOrNull()
-                val yet = tokens.getOrNull(yetIndex)?.toBoolean()
-
-
-                // Parse attributes
-                val attributes = attrIndices.map { index ->
-                    tokens.getOrNull(index)?.toIntOrNull() ?: 0 // Default to 0 if not found or null
-                }
+                val visited = tokens.getOrNull(visitedIndex)?.toIntOrNull() == 1  // 1の場合はtrue
+                val evaluation = tokens.getOrNull(evaluationIndex)?.toIntOrNull() ?: 3  // 評価がない場合はデフォルト3
 
                 // Ensure all values are not null before adding
-                if (id != null && breweryName != null && sakeName != null && latitude != null && longitude != null && yet != null) {
+                if (id != null && breweryName != null && sakeName != null && latitude != null && longitude != null) {
                     sakeBreweries.add(
                         SakeBrewery(
                             ID = id,
@@ -101,8 +87,8 @@ class MapPins {
                             latitude = latitude,
                             longitude = longitude,
                             distance = calculateDistance(latitude, longitude, userLatitude, userLongitude),
-                            yet = yet,
-                            attributes = attributes
+                            yet = visited,
+                            evaluation = evaluation
                         )
                     )
                 }
@@ -113,4 +99,3 @@ class MapPins {
         }
     }
 }
-

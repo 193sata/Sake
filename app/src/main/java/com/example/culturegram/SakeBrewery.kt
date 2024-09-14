@@ -16,5 +16,6 @@ class SakeBrewery(
     val longitude: Double,
     val distance: Double,
     val yet: Boolean,
-    val attributes: List<Int> // Store attributes as a list of integers
+    var evaluation: Int,
+//    val attributes: List<Int> // Store attributes as a list of integers
 )

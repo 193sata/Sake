@@ -65,7 +65,7 @@ class Map {
 
     // カメラポジションは変更しない（ズームレベルや位置をそのまま）
     val cameraPositionState = rememberCameraPositionState {
-      position = CameraPosition.fromLatLngZoom(currentLocation, 7f) // 初期位置を設定
+      position = CameraPosition.fromLatLngZoom(currentLocation, 10f) // 初期位置を設定
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

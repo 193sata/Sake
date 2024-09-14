@@ -8,7 +8,7 @@ package com.example.culturegram
     val yet: Int,
 )*/
 
-class SakeBrewery (
+class SakeBrewery(
     val ID: Int,
     val breweryName: String,
     val sakeName: String,
@@ -16,5 +16,5 @@ class SakeBrewery (
     val longitude: Double,
     val distance: Double,
     val yet: Int,
-    val attr: String // Changed attr to a list of strings
+    val attributes: List<Int> // Store attributes as a list of integers
 )

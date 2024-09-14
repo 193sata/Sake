@@ -256,7 +256,7 @@ class Status {
 
     // CSVファイルを保存する関数
     private fun saveCsv(context: Context, sakeBrewList: List<SakeBrew>) {
-        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo0.csv"
+        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo_full_utf8.csv"
         val csvFile = File(filePath)
 
         try {

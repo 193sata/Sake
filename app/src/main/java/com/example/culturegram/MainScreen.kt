@@ -100,6 +100,17 @@ class MainScreen {
                     tint = iconColor
                 )
             }
+
+            // 最後は消す
+            IconButton(onClick = {
+                navController.navigate("adviser")
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Status Icon",
+                    tint = iconColor
+                )
+            }
         }
     }
 }

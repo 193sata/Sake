@@ -84,8 +84,4 @@ dependencies {
 
     implementation(libs.google.maps.compose) //google map
 
-    implementation("com.squareup.okhttp3:okhttp:4.2.2")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
-    implementation ("org.apache.httpcomponents:httpclient:4.3.4")
-
 }

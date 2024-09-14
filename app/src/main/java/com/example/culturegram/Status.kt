@@ -301,14 +301,26 @@ class Status {
         if (csvFile.exists()) {
             csvFile.forEachLine { line ->
                 val parts = line.split(",")
-                if (parts.size == 6) {  // ID, name, representativeSake, latitude, longitude, visited
+                if (parts.size == 15) {  // ID, name, representativeSake, latitude, longitude, visited, clear, link, single, beer, fruit, wine, spirits, liquor, other
                     val id = parts[0].toIntOrNull() ?: 0
                     val name = parts[1]
                     val representativeSake = parts[2]
                     val latitude = parts[3].toDoubleOrNull() ?: 0.0
                     val longitude = parts[4].toDoubleOrNull() ?: 0.0
                     val visited = parts[5].toIntOrNull() == 1
-                    syuzoList.add(Syuzo(id, name, representativeSake, latitude, longitude, visited))
+                    val clear = parts[6].toIntOrNull() ?: 0
+                    val link = parts[7].toIntOrNull() ?: 0
+                    val single = parts[8].toIntOrNull() ?: 0
+                    val beer = parts[9].toIntOrNull() ?: 0
+                    val fruit = parts[10].toIntOrNull() ?: 0
+                    val wine = parts[11].toIntOrNull() ?: 0
+                    val spirits = parts[12].toIntOrNull() ?: 0
+                    val liquor = parts[13].toIntOrNull() ?: 0
+                    val other = parts[14].toIntOrNull() ?: 0
+
+                    syuzoList.add(
+                        Syuzo(id, name, representativeSake, latitude, longitude, visited, clear, link, single, beer, fruit, wine, spirits, liquor, other)
+                    )
                 }
             }
         }
@@ -333,7 +345,6 @@ class Status {
         file.parentFile?.mkdirs()
         file.writeText(
             """
-        ID,製造所名,代表酒,緯度,経度,既訪,清,連,単,ビ,果,ウ,ス,リ,他
         1,瑞鷹（株）川尻本蔵,瑞鷹,32.73743225,130.6823003,0,1,0,0,0,0,0,0,1,1
         2,瑞鷹（株）東肥蔵,東肥赤酒,32.74092219,130.6813227,0,0,1,1,0,0,0,1,0,1
         3,熊本ワインファーム（株）西里醸造所,菊鹿シャルドネ,33.07834405,130.7703336,0,0,0,0,0,1,0,0,0,0
@@ -414,12 +425,21 @@ class Status {
 
 }
 
-// WorldHeritageデータクラス
+// Syuzoデータクラス
 data class Syuzo(
     val id: Int,
     val name: String,
     val representativeSake: String,
     val latitude: Double,
     val longitude: Double,
-    var visited: Boolean
+    var visited: Boolean,
+    val clear: Int,   // 清
+    val link: Int,    // 連
+    val single: Int,  // 単
+    val beer: Int,    // ビ
+    val fruit: Int,   // 果
+    val wine: Int,    // ウ
+    val spirits: Int, // ス
+    val liquor: Int,  // リ
+    val other: Int    // 他
 )

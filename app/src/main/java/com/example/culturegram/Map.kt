@@ -36,7 +36,7 @@ class Map {
   private var sakeBreweries: MutableList<SakeBrewery> = mutableListOf()
   private var heritagesInside: MutableList<SakeBrewery> = mutableListOf()
   private var mapPins = MapPins()
-  private var allowedR = 100000.0
+  private var allowedR = 100.0
 
   @Composable
   fun Content(navController: NavController) {
@@ -65,7 +65,7 @@ class Map {
 
     // カメラポジションは変更しない（ズームレベルや位置をそのまま）
     val cameraPositionState = rememberCameraPositionState {
-      position = CameraPosition.fromLatLngZoom(currentLocation, 7f) // 初期位置を設定
+      position = CameraPosition.fromLatLngZoom(currentLocation, 10f) // 初期位置を設定
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -104,7 +104,7 @@ class Map {
               title = sakeBrewery.breweryName, // デフォルトのタイトル（カスタムUIで表示するためここでの自動表示は抑制）
               icon = when {
                 isInside -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)  // heritagesInsideに含まれている場合は黄色
-                sakeBrewery.yet == 1 -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)  // 行った場所
+                sakeBrewery.yet == true -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)  // 行った場所
                 else -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)  // 行ってない場所
               },
               onClick = {

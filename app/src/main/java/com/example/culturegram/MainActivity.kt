@@ -42,6 +42,10 @@ class MainActivity : ComponentActivity() {
                         composable("status") {
                             Status().Content(navController)
                         }
+                        composable("adviser") {
+                            val adviser = Adviser()
+                            adviser.Content()
+                        }
                         composable(
                             "edit/{heritageName}",
                             arguments = listOf(navArgument("heritageName") { defaultValue = "Unknown" })

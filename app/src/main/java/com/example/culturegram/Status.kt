@@ -3,13 +3,13 @@ package com.example.culturegram
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.exifinterface.media.ExifInterface
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,14 +19,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.Canvas
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import java.io.File
@@ -42,16 +41,16 @@ class Status {
 
     @Composable
     fun AchievementPage(navController: NavHostController, context: Context) {
-        val heritageList = loadOrCreateCsv()
-        updateAchievementStatus(heritageList, context)
+        val sakeBrewList = loadOrCreateCsv(context)  // CSVを読み込むか、存在しなければ作成
+        updateAchievementStatus(sakeBrewList, context)
 
-        val visitedCount = heritageList.count { it.visited }
-        val totalCount = heritageList.size
+        val visitedCount = sakeBrewList.count { it.visited }
+        val totalCount = sakeBrewList.size
         val achievementRatio = if (totalCount > 0) visitedCount.toFloat() / totalCount else 0f
 
-        var sakeBrew by remember { mutableStateOf<SakeBrew?>(null) }
+        var selectedSakeBrew by remember { mutableStateOf<SakeBrew?>(null) }
 
-        if (sakeBrew == null) {
+        if (selectedSakeBrew == null) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -76,67 +75,35 @@ class Status {
                     contentPadding = PaddingValues(0.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(heritageList.size) { index ->
-                        val heritage = heritageList[index]
-
-                        val latitudeStr = createLatitudeStr(heritage.latitude)
-                        println("latitudeStr")
-                        println(latitudeStr)
-                        // 経度の処理
-                        val longitudeStr = createLongitudeStr(heritage.longitude)
-
-                        val imagePath = getSavedImagePath(context, heritage.name)
-                            ?: "/storage/emulated/0/Android/data/com.example.culturegram/files/Pictures/${heritage.name}-0.jpg"
+                    items(sakeBrewList.size) { index ->
+                        val sakeBrew = sakeBrewList[index]
+                        val imagePath = getSavedImagePath(context, sakeBrew.name)
+                            ?: "/storage/emulated/0/Android/data/com.example.culturegram/files/Pictures/${sakeBrew.name}-0.jpg"
                         val imageFile = File(imagePath)
-                        // 緯度経度を文字列に変換し、小数点を除いて結合
-                        val latLongStr = "${latitudeStr.replace(".", "")}${longitudeStr.replace(".", "")}"
-                        val imageName = "heritage_$latLongStr"
-                        println("heritagename")
-                        println(heritage.name)
-                        println("緯度")
-                        println(heritage.latitude)
-                        println("経度")
-                        println(heritage.longitude)
-                        println("imageName")
-                        println(imageName)
+
                         Box(
                             modifier = Modifier
                                 .border(0.5.dp, Color.Black)
                                 .aspectRatio(1f)
                                 .clickable {
-                                    sakeBrew = heritage
+                                    selectedSakeBrew = sakeBrew
                                 }
                         ) {
                             if (imageFile.exists()) {
                                 val bitmap = loadRotatedBitmap(imageFile)
                                 Image(
                                     bitmap = bitmap.asImageBitmap(),
-                                    contentDescription = heritage.name,
+                                    contentDescription = sakeBrew.name,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
                                 )
                             } else {
-                                val context = LocalContext.current
-                                val resId = context.resources.getIdentifier(imageName, "drawable", context.packageName)
-                                println("resId")
-                                println(resId)
-                                if (resId != 0) {
-                                    // drawableに指定の名前の画像が存在する場合
-                                    Image(
-                                        painter = painterResource(id = resId),
-                                        contentDescription = imageName,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
-                                    // 指定の名前の画像が存在しない場合はNo Imageを表示
-                                    Image(
-                                        painter = painterResource(id = R.drawable.no_image),
-                                        contentDescription = "No Image",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                }
+                                Image(
+                                    painter = painterResource(id = R.drawable.no_image),
+                                    contentDescription = "No Image",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
                             }
                         }
                     }
@@ -144,9 +111,13 @@ class Status {
             }
         } else {
             EnlargedImageScreen(
-                heritage = sakeBrew!!,
+                heritage = selectedSakeBrew!!,
                 navController = navController,
-                onBackClick = { sakeBrew = null }
+                onBackClick = { selectedSakeBrew = null },
+                onVisitStatusChanged = { newVisitedStatus ->
+                    selectedSakeBrew!!.visited = newVisitedStatus
+                    saveCsv(context, sakeBrewList)  // 訪問ステータスをCSVに保存
+                }
             )
         }
     }
@@ -183,7 +154,8 @@ class Status {
     fun EnlargedImageScreen(
         heritage: SakeBrew,
         navController: NavHostController,
-        onBackClick: () -> Unit
+        onBackClick: () -> Unit,
+        onVisitStatusChanged: (Boolean) -> Unit
     ) {
         Scaffold(
             topBar = {
@@ -193,64 +165,29 @@ class Status {
                         IconButton(onClick = onBackClick) {
                             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "戻る")
                         }
-                    },
-                    actions = {
-                        IconButton(onClick = {
-                            navController.navigate("edit/${heritage.name}")
-                        }) {
-                            Icon(imageVector = Icons.Filled.Edit, contentDescription = "編集")
-                        }
                     }
                 )
             },
             content = { padding ->
-                val latitudeStr = createLatitudeStr(heritage.latitude)
-                val longitudeStr = createLongitudeStr(heritage.longitude)
-                // 緯度経度を文字列に変換し、小数点を除いて結合
-                val latLongStr = "${latitudeStr.replace(".", "")}${longitudeStr.replace(".", "")}"
-                val imageName = "heritage_$latLongStr"
-
-                // 保存された画像パスを取得
-                val imagePath = getSavedImagePath(LocalContext.current, heritage.name)
-                    ?: "/storage/emulated/0/Android/data/com.example.culturegram/files/Pictures/${heritage.name}-0.jpg"
-                val imageFile = File(imagePath)
-                println("imagename")
-                println(imageName)
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
                 ) {
-                    if (imageFile.exists()) {
-                        val bitmap = loadRotatedBitmap(imageFile)
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = heritage.name,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                    // 酒造の情報を表示
+                    Text(text = "代表酒: ${heritage.representativeSake}")
+                    Text(text = "緯度: ${heritage.latitude}")
+                    Text(text = "経度: ${heritage.longitude}")
+
+                    // 訪問ステータスを編集できるチェックボックス
+                    Row(modifier = Modifier.padding(16.dp)) {
+                        Text(text = "訪れたか: ")
+                        Checkbox(
+                            checked = heritage.visited,
+                            onCheckedChange = { isChecked ->
+                                onVisitStatusChanged(isChecked)
+                            }
                         )
-                    } else {
-                        val context = LocalContext.current
-                        val resId = context.resources.getIdentifier(imageName, "drawable", context.packageName)
-                        println("resId")
-                        println(resId)
-                        if (resId != 0) {
-                            // drawableに指定の名前の画像が存在する場合
-                            Image(
-                                painter = painterResource(id = resId),
-                                contentDescription = imageName,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            // 指定の名前の画像が存在しない場合はNo Imageを表示
-                            Image(
-                                painter = painterResource(id = R.drawable.no_image),
-                                contentDescription = "No Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
                     }
                 }
             }
@@ -263,13 +200,13 @@ class Status {
         var rotatedBitmap = bitmap
 
         try {
-            val exif = ExifInterface(imageFile.path)
-            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            val exif = androidx.exifinterface.media.ExifInterface(imageFile.path)
+            val orientation = exif.getAttributeInt(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL)
 
             rotatedBitmap = when (orientation) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
-                ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
-                ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
                 else -> bitmap
             }
         } catch (e: IOException) {
@@ -279,7 +216,6 @@ class Status {
         return rotatedBitmap
     }
 
-    // 画像を指定した角度で回転させる関数
     private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
         val matrix = android.graphics.Matrix().apply {
             postRotate(degrees)
@@ -287,114 +223,78 @@ class Status {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-    // CSVを読み込むか、なければ作成する関数
-    private fun loadOrCreateCsv(): List<SakeBrew> {
-        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/heritages.csv"
+    // CSVを読み込むか、存在しない場合は作成する関数
+    private fun loadOrCreateCsv(context: Context): List<SakeBrew> {
+        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo0.csv"
         val csvFile = File(filePath)
 
         // ファイルが存在しない場合、作成する
         if (!csvFile.exists()) {
-            createCsv(csvFile)
+            createCsv(context, csvFile)
         }
 
-        val heritageList = mutableListOf<SakeBrew>()
+        val sakeBrewList = mutableListOf<SakeBrew>()
         if (csvFile.exists()) {
             csvFile.forEachLine { line ->
                 val parts = line.split(",")
-                if (parts.size == 4) {
-                    val name = parts[0]
-                    val latitude = parts[1].toDoubleOrNull() ?: 0.0
-                    val longitude = parts[2].toDoubleOrNull() ?: 0.0
-                    val visited = parts[3].toIntOrNull() == 1
-                    heritageList.add(SakeBrew(name, latitude, longitude, visited))
+                if (parts.size == 6) {
+                    val id = parts[0].toIntOrNull() ?: 0
+                    val name = parts[1]
+                    val representativeSake = parts[2]
+                    val latitude = parts[3].toDoubleOrNull() ?: 0.0
+                    val longitude = parts[4].toDoubleOrNull() ?: 0.0
+                    val visited = parts[5].toIntOrNull() == 1
+                    sakeBrewList.add(SakeBrew(id, name, representativeSake, latitude, longitude, visited))
                 }
             }
         }
 
-        return heritageList
+        return sakeBrewList
     }
 
-    // 達成度を更新する関数
-    private fun updateAchievementStatus(heritageList: List<SakeBrew>, context: Context) {
-        heritageList.forEach { heritage ->
-            val imagePath = getSavedImagePath(context, heritage.name)
-            if (imagePath != null && File(imagePath).exists()) {  // 画像が存在する場合にのみカウント
-                heritage.visited = true
-            } else {
-                heritage.visited = false  // 画像がない場合は未達成にする
-            }
+    // CSVファイルを保存する関数
+    private fun saveCsv(context: Context, sakeBrewList: List<SakeBrew>) {
+        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo0.csv"
+        val csvFile = File(filePath)
+        csvFile.bufferedWriter().use { writer ->
+            sakeBrewList.forEach { sakeBrew ->
+                writer.write("${sakeBrew.id},${sakeBrew.name},${sakeBrew.representativeSake},${sakeBrew.latitude},${sakeBrew.longitude},${if (sakeBrew.visited) 1 else 0}\n")
+           }
         }
     }
-
-    // CSVファイルを作成する関数
-    private fun createCsv(file: File) {
+    // CSVファイルが存在しない場合に作成する関数
+    private fun createCsv(context: Context, file: File) {
         file.parentFile?.mkdirs()
         file.writeText(
             """
-        法隆寺地域の仏教建造物,34.6145,135.7356,0
-        姫路城,34.8394,134.6939,0
-        古都京都の文化財,35.0116,135.7681,0
-        白川郷・五箇山の合掌造り集落,36.2605,137.0468,0
-        原爆ドーム,34.3955,132.4536,0
-        厳島神社,34.2955,132.3197,0
-        古都奈良の文化財,34.6851,135.8048,0
-        日光の社寺,36.7197,139.6986,0
-        琉球王国のグスク及び関連遺産群,26.2173,127.7148,0
-        紀伊山地の霊場と参詣道,33.8711,135.7740,0
-        石見銀山遺跡とその文化的景観,35.1214,132.4622,0
-        平泉‐仏国土（浄土）を表す建築・庭園及び考古学的遺跡群‐,39.0015,141.1082,0
-        富士山‐信仰の対象と芸術の源泉‐,35.3606,138.7274,0
-        富岡製糸場と絹産業遺産群,36.2586,138.8894,0
-        明治日本の産業革命遺産,33.5904,130.4017,0
-        ル・コルビュジエの建築作品‐近代建築運動への顕著な貢献‐,35.6586,139.7454,0
-        「神宿る島」宗像・沖ノ島と関連遺産群,33.9180,130.5339,0
-        長崎と天草地方の潜伏キリシタン関連遺産,32.7503,129.8777,0
-        百舌鳥・古市古墳群‐古代日本の墳墓群‐,34.5565,135.4885,0
-        北海道・北東北の縄文遺跡群,43.6343,142.5451,0
-        佐渡島の金山,37.8034,138.3968,0
+        1,瑞鷹（株）　川尻本蔵,瑞鷹,32.73743225,130.6823003,0,None
+        2,瑞鷹（株）　東肥蔵,瑞鷹,32.74092219,130.6813227,0,None
         """.trimIndent()
         )
     }
 
-    private fun createLatitudeStr(latitude: Double): String {
-        val latitudeStr: String  = latitude.toString()
-        if (latitude.toString().contains(".")) {
-            val decimalPart = latitude.toString().split(".")[1]
-            // 小数点以下の桁数を確認し、3桁の場合にゼロを追加
-            if (decimalPart.length == 3) {
-                return latitudeStr + "0"
-            }
-            else {
-                return latitudeStr
-            }
+    // 訪問した酒造かどうかのステータスを更新
+    private fun updateAchievementStatus(sakeBrewList: List<SakeBrew>, context: Context) {
+        sakeBrewList.forEach { sakeBrew ->
+            val imagePath = getSavedImagePath(context, sakeBrew.name)
+            sakeBrew.visited = imagePath != null && File(imagePath).exists()
         }
-
-
-        return latitudeStr
     }
 
-    private fun createLongitudeStr(longitude: Double): String {
-        val longitudeStr: String = longitude.toString()
-        if (longitude.toString().contains(".")) {
-            val decimalPart = longitude.toString().split(".")[1]
-            // 小数点以下の桁数を確認し、3桁の場合にゼロを追加
-            if (decimalPart.length == 3) {
-                return longitudeStr + "0"
-            } else {
-                return longitudeStr
-            }
-        }
-
-        return longitudeStr
+    // 保存された画像パスを取得する関数
+    private fun getSavedImagePath(context: Context, sakeBrewName: String): String? {
+        val basePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/Pictures"
+        val imageFile = File("$basePath/$sakeBrewName-0.jpg")
+        return if (imageFile.exists()) imageFile.absolutePath else null
     }
-
 }
 
-// WorldHeritageデータクラス
+// 酒造のデータクラス
 data class SakeBrew(
+    val id: Int,
     val name: String,
+    val representativeSake: String,
     val latitude: Double,
     val longitude: Double,
-    var visited: Boolean,
-    var imagePath: String = "" // 画像パスを保持する
+    var visited: Boolean
 )

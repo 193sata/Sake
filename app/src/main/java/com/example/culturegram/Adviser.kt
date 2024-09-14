@@ -25,6 +25,7 @@ class Adviser {
         // 表示するテキストを一文字ずつ描画するためのステート
         var displayedText by remember { mutableStateOf("") }
         val fullText = makeText() // すべてのテキストを取得
+        val a = 1
 
         // テキストを一文字ずつ表示する
         LaunchedEffect(fullText) {

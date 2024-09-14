@@ -56,8 +56,8 @@ class MainScreen {
                         contentState.value = { Map().Content(navController) }
                         backgroundColor.value = Color.White
                     }
-                    "adviser" -> {
-                        contentState.value = { Adviser().Content() }
+                    "shorts" -> {
+                        contentState.value = { Shorts().Content() }
                         backgroundColor.value = Color.Black
                     }
                     "status" -> {
@@ -85,9 +85,9 @@ class MainScreen {
                 )
             }
 
-            IconButton(onClick = { onButtonClick("adviser") }) {
+            IconButton(onClick = { onButtonClick("shorts") }) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    imageVector = Icons.Default.Folder,
                     contentDescription = "Shorts Icon",
                     tint = iconColor
                 )
@@ -95,7 +95,7 @@ class MainScreen {
 
             IconButton(onClick = { onButtonClick("status") }) {
                 Icon(
-                    imageVector = Icons.Default.Folder,
+                    imageVector = Icons.Default.Person,
                     contentDescription = "Status Icon",
                     tint = iconColor
                 )

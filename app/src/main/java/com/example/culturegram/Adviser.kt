@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.ContentScale
 
 class Adviser {
+    val text: List<String> = List(9) { "生成されたテキスト${it + 1}" }
+
     @Composable
     fun Content() {
         Box(
@@ -56,4 +58,19 @@ class Adviser {
     fun makeText() {
 
     }
+
+    fun getAttr(): List<List<Int>> {
+        return listOf(
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1)
+        )
+    }
+
 }

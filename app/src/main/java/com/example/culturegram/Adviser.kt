@@ -20,18 +20,29 @@ import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.delay
 
 class Adviser {
+
     @Composable
     fun Content() {
         // 表示するテキストを一文字ずつ描画するためのステート
+        val chatGptAccess = ChatGptApiIO()
         var displayedText by remember { mutableStateOf("") }
-        val fullText = makeText() // すべてのテキストを取得
+        var fullText by remember { mutableStateOf("") } // ここに返答を返す
+
+        // 非同期でChatGPTのレスポンスを取得し、状態を更新
+        LaunchedEffect(Unit) {
+            chatGptAccess.getResponse("Hello!") { responseText ->
+                // ChatGPTの返答を受け取ったときに`fullText`を更新
+                println(responseText)
+                fullText = responseText // 動的に変更
+            }
+        }
 
         // テキストを一文字ずつ表示する
         LaunchedEffect(fullText) {
             displayedText = ""
             for (i in fullText.indices) {
                 displayedText += fullText[i]
-                delay(60) // 各文字の表示間隔（150ミリ秒ごとに次の文字を表示）
+                delay(60) // 各文字の表示間隔（60ミリ秒ごとに次の文字を表示）
             }
         }
 
@@ -66,72 +77,11 @@ class Adviser {
                     .padding(24.dp) // Increase padding inside the bubble for more text space
             ) {
                 AnimatedText(displayedText)
-
-                /*Text(
-                    text = displayedText, // 一文字ずつ表示するテキスト
-                    color = Color.Black, // Text color
-                    fontSize = 20.sp, // Slightly larger text size
-                    lineHeight = 26.sp // Adjust line height for better spacing
-                )*/
             }
         }
     }
 
-    // 生成されたテキストを作成
-    fun makeText(): String {
-        val attributes = getAttr() // getAttrを呼び出す
-        val sumList = calculateSumAttr(attributes) // 各列の合計を計算
-        val maxIndex = calculateMaxIndex(sumList) // 最大値のインデックスを取得
-        println("各列の合計値: $sumList") // デバッグ用に出力
-        println("最大値のインデックス: $maxIndex") // 最大値のインデックスを出力
-
-        return "${maxIndex}ばかり飲んでるにゃ〜，あああああああああああああああ" // Return the generated text as a String
-    }
-
-    // 各列の合計値を計算
-    fun calculateSumAttr(attributes: List<List<Int>>): List<Int> {
-        val numColumns = attributes[0].size // 列の数
-        val sums = MutableList(numColumns) { 0 } // 合計値を保持するリスト
-
-        for (row in attributes) {
-            for (i in 0 until numColumns) {
-                sums[i] += row[i] // 各列の値を合計
-            }
-        }
-
-        return sums
-    }
-
-    // 最大値のインデックスを取得
-    fun calculateMaxIndex(sumList: List<Int>): Int {
-        var maxIndex = 0
-        var maxValue = sumList[0]
-
-        for (i in sumList.indices) {
-            if (sumList[i] > maxValue) {
-                maxValue = sumList[i]
-                maxIndex = i
-            }
-        }
-
-        return maxIndex
-    }
-
-    // サンプルデータを取得
-    fun getAttr(): List<List<Int>> {
-        return listOf(
-            listOf(0, 0, 0, 1, 0, 0, 0, 0, 0),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1)
-        )
-    }
-
+    // AnimatedText関数は変更なし
     @Composable
     fun AnimatedText(text: String) {
         // テキストのフェードイン用のアニメーション
@@ -153,5 +103,9 @@ class Adviser {
             lineHeight = 26.sp,
             modifier = Modifier.alpha(alpha) // アルファ値を設定してフェードイン
         )
+    }
+
+    fun makePrompt() {
+
     }
 }

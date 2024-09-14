@@ -23,11 +23,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import java.io.File
 import java.io.IOException
@@ -256,6 +260,16 @@ class Status {
                             )
                         }
                     }
+                    Text(
+                        text = syuzo.representativeSake,  // 画像名
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(8.dp)  // テキストの周りにパディングを追加
+                            .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(8.dp))  // 半透明の黒い背景と角丸
+                            .padding(8.dp),  // 背景内のテキストに追加パディング
+                        color = Color.White,  // 白い文字色
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         )
@@ -342,6 +356,33 @@ class Status {
             } else {
                 syuzo.visited = false  // 画像がない場合は未達成にする
             }
+        }
+
+        // CSVファイルに更新された visited 状態を書き込む
+        saveCsv(syuzoList, context)
+    }
+
+    private fun saveCsv(syuzoList: List<Syuzo>, context: Context) {
+        val filePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/csv/syuzo.csv"
+        val csvFile = File(filePath)
+
+        try {
+            // ディレクトリが存在しない場合、作成する
+            val parentDir = csvFile.parentFile
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs()  // ディレクトリを作成
+            }
+
+            csvFile.bufferedWriter().use { writer ->
+                syuzoList.forEach { syuzo ->
+                    writer.write(
+                        "${syuzo.id},${syuzo.name},${syuzo.representativeSake},${syuzo.latitude},${syuzo.longitude},${if (syuzo.visited) 1 else 0}," +
+                                "${syuzo.clear},${syuzo.link},${syuzo.single},${syuzo.beer},${syuzo.fruit},${syuzo.wine},${syuzo.spirits},${syuzo.liquor},${syuzo.other}\n"
+                    )
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()  // エラーログを表示
         }
     }
 

@@ -17,8 +17,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.ContentScale
 
 class Adviser {
-    val text: List<String> = List(9) { "生成されたテキスト${it + 1}" }
+    //var text: String = "どらくえふうのきょじがあらわれた！\nきょじのこうしん！"
 
+    //text = this.makeText
     @Composable
     fun Content() {
         Box(
@@ -46,7 +47,7 @@ class Adviser {
                     .padding(16.dp) // Padding inside the bubble
             ) {
                 Text(
-                    text = "どらくえふうのきょじがあらわれた！\nきょじのこうしん！", // Sample Japanese text
+                    text = makeText(), // Sample Japanese text
                     color = Color.White, // Text color
                     fontSize = 18.sp, // Text size to match retro style
                     lineHeight = 22.sp // Adjust line height for better spacing
@@ -55,13 +56,49 @@ class Adviser {
         }
     }
 
-    fun makeText() {
+    // 生成されたテキストを作成
+    fun makeText(): String {
+        val attributes = getAttr() // getAttrを呼び出す
+        val sumList = calculateSumAttr(attributes) // 各列の合計を計算
+        val maxIndex = calculateMaxIndex(sumList) // 最大値のインデックスを取得
+        println("各列の合計値: $sumList") // デバッグ用に出力
+        println("最大値のインデックス: $maxIndex") // 最大値のインデックスを出力
 
+        return "${maxIndex}ばかり飲んでるにゃ〜" // Return the generated text as a String
+    }
+    // 各列の合計値を計算
+    fun calculateSumAttr(attributes: List<List<Int>>): List<Int> {
+        val numColumns = attributes[0].size // 列の数
+        val sums = MutableList(numColumns) { 0 } // 合計値を保持するリスト
+
+        for (row in attributes) {
+            for (i in 0 until numColumns) {
+                sums[i] += row[i] // 各列の値を合計
+            }
+        }
+
+        return sums
     }
 
+    // 最大値のインデックスを取得
+    fun calculateMaxIndex(sumList: List<Int>): Int {
+        var maxIndex = 0
+        var maxValue = sumList[0]
+
+        for (i in sumList.indices) {
+            if (sumList[i] > maxValue) {
+                maxValue = sumList[i]
+                maxIndex = i
+            }
+        }
+
+        return maxIndex
+    }
+
+    // サンプルデータを取得
     fun getAttr(): List<List<Int>> {
         return listOf(
-            listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
+            listOf(0, 0, 0, 1, 0, 0, 0, 0, 0),
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
@@ -72,5 +109,4 @@ class Adviser {
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1)
         )
     }
-
 }

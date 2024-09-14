@@ -167,14 +167,14 @@ class Status {
             Canvas(modifier = Modifier.size(120.dp)) {
                 drawCircle(
                     color = Color.LightGray,
-                    style = Stroke(width = 15f)
+                    style = Stroke(width = 50f)
                 )
                 drawArc(
                     color = Color.Green,
                     startAngle = -90f,
                     sweepAngle = 360 * percentage,
                     useCenter = false,
-                    style = Stroke(width = 15f, cap = StrokeCap.Round)
+                    style = Stroke(width = 50f, cap = StrokeCap.Round)
                 )
             }
             Text(

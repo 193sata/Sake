@@ -1,57 +1,78 @@
 package com.example.culturegram
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.ContentScale
+import kotlinx.coroutines.delay
 
 class Adviser {
-    //var text: String = "どらくえふうのきょじがあらわれた！\nきょじのこうしん！"
-
-    //text = this.makeText
     @Composable
     fun Content() {
-        Box(
+        // 表示するテキストを一文字ずつ描画するためのステート
+        var displayedText by remember { mutableStateOf("") }
+        val fullText = makeText() // すべてのテキストを取得
+
+        // テキストを一文字ずつ表示する
+        LaunchedEffect(fullText) {
+            displayedText = ""
+            for (i in fullText.indices) {
+                displayedText += fullText[i]
+                delay(60) // 各文字の表示間隔（150ミリ秒ごとに次の文字を表示）
+            }
+        }
+
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black) // Set the background color to black to match Dragon Quest style
+                .background(Color.White) // Set the background color to white
         ) {
-            // Background image
-            Image(
-                painter = painterResource(id = R.drawable.spanyan1t),
-                contentDescription = "Spanyan Image",
-                modifier = Modifier.fillMaxSize(),  // Adjust the size as needed
-                contentScale = ContentScale.Crop    // Adjust content scaling as needed
-            )
-
-            // Speech bubble (Dragon Quest style)
+            // Image section (70% of the screen height)
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter) // Position at the bottom center
-                    .padding(16.dp) // Add some padding
-                    .fillMaxWidth(0.9f) // Make the box a bit narrower than the screen
-                    .clip(RectangleShape) // Dragon Quest style usually has rectangular borders
-                    .border(2.dp, Color.White) // White border to match the style
-                    .background(Color.Black) // Black background
-                    .padding(16.dp) // Padding inside the bubble
+                    .fillMaxWidth()
+                    .weight(7f) // Takes up 70% of the space
             ) {
-                Text(
-                    text = makeText(), // Sample Japanese text
-                    color = Color.White, // Text color
-                    fontSize = 18.sp, // Text size to match retro style
-                    lineHeight = 22.sp // Adjust line height for better spacing
+                Image(
+                    painter = painterResource(id = R.drawable.sakespanyan),
+                    contentDescription = "Spanyan Image",
+                    modifier = Modifier.fillMaxSize(), // Adjust the size as needed
+                    contentScale = ContentScale.Crop    // Adjust content scaling as needed
                 )
+            }
+
+            // Text section (30% of the screen height)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3f) // Takes up 30% of the space
+                    .padding(16.dp) // Add some padding
+                    .clip(RoundedCornerShape(16.dp)) // Use RoundedCornerShape for rounded corners
+                    .border(3.dp, Color.Black, RoundedCornerShape(16.dp)) // Black border with rounded corners
+                    .background(Color.White) // White background
+                    .padding(24.dp) // Increase padding inside the bubble for more text space
+            ) {
+                AnimatedText(displayedText)
+
+                /*Text(
+                    text = displayedText, // 一文字ずつ表示するテキスト
+                    color = Color.Black, // Text color
+                    fontSize = 20.sp, // Slightly larger text size
+                    lineHeight = 26.sp // Adjust line height for better spacing
+                )*/
             }
         }
     }
@@ -64,8 +85,9 @@ class Adviser {
         println("各列の合計値: $sumList") // デバッグ用に出力
         println("最大値のインデックス: $maxIndex") // 最大値のインデックスを出力
 
-        return "${maxIndex}ばかり飲んでるにゃ〜" // Return the generated text as a String
+        return "${maxIndex}ばかり飲んでるにゃ〜，あああああああああああああああ" // Return the generated text as a String
     }
+
     // 各列の合計値を計算
     fun calculateSumAttr(attributes: List<List<Int>>): List<Int> {
         val numColumns = attributes[0].size // 列の数
@@ -107,6 +129,29 @@ class Adviser {
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1),
             listOf(0, 0, 0, 1, 1, 0, 1, 1, 1)
+        )
+    }
+
+    @Composable
+    fun AnimatedText(text: String) {
+        // テキストのフェードイン用のアニメーション
+        var isVisible by remember { mutableStateOf(false) }
+        val alpha: Float by animateFloatAsState(
+            targetValue = if (isVisible) 1f else 0f,
+            animationSpec = tween(durationMillis = 1000) // フェードインの持続時間
+        )
+
+        // フェードインアニメーションを開始
+        LaunchedEffect(text) {
+            isVisible = true
+        }
+
+        Text(
+            text = text,
+            color = Color.Black,
+            fontSize = 20.sp,
+            lineHeight = 26.sp,
+            modifier = Modifier.alpha(alpha) // アルファ値を設定してフェードイン
         )
     }
 }

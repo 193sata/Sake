@@ -32,7 +32,8 @@ import java.io.IOException
 
 
 class Map {
-  var currentLocation by mutableStateOf(LatLng(32.81449335495487, 130.72729505562057)) // デフォルトの位置（熊本）
+  var currentLocation by mutableStateOf(LatLng(32.80029364484345, 130.7026972266769)) // デフォルトの位置（熊本）
+  var demoLocation by mutableStateOf(LatLng(32.80029364484345, 130.7026972266769))
   private var sakeBreweries: MutableList<SakeBrewery> = mutableListOf()
   private var heritagesInside: MutableList<SakeBrewery> = mutableListOf()
   private var mapPins = MapPins()
@@ -80,6 +81,7 @@ class Map {
           // カスタムマーカー（青丸）を表示する
           Marker(
             state = MarkerState(position = LatLng(currentLocation.latitude, currentLocation.longitude)),
+            //state = MarkerState(position = LatLng(demoLocation.latitude, demoLocation.longitude)),
             icon = createCustomMarker(Color(0xFF4A90E2)),  // 淡い青色のカスタムマーカー
             title = "現在地",
             //snippet = "現在地",
@@ -89,6 +91,7 @@ class Map {
           // 現在地を中心に半径500mの円を描画
           Circle(
             center = LatLng(currentLocation.latitude, currentLocation.longitude), // Markerと同じ位置に円を描画
+            //center = LatLng(demoLocation.latitude, demoLocation.longitude), // Markerと同じ位置に円を描画
             radius = allowedR, // 半径500m
             strokeColor = Color(0x220000FF), // 円の輪郭の色
             fillColor = Color(0x220000FF), // 透明な青

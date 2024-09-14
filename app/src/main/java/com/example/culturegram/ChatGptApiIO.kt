@@ -12,7 +12,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 class ChatGptApiIO {
-    private val apiKey = "hoge"//BuildConfig.CHATGPT_API_KEY // ここにOpenAIのAPIキーを入力
+    private val apiKey = BuildConfig.CHATGPT_API_KEY // ここにOpenAIのAPIキーを入力
     private val url = "https://api.openai.com/v1/chat/completions"
     private val client = OkHttpClient()// OkHttpClientを使用してネットワーク通信を行う
 

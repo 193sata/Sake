@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -6,6 +8,8 @@ plugins {
 android {
     namespace = "com.example.culturegram"
     compileSdk = 34
+    android { packagingOptions { resources.excludes.add("META-INF/*") } }
+
 
     defaultConfig {
         applicationId = "com.example.culturegram"
@@ -18,6 +22,19 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
+        // local.properties ファイルからプロパティを読み込む
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { stream ->
+                localProperties.load(stream)
+            }
+        }
+
+        // 環境変数を BuildConfig に設定する
+        buildConfigField("String", "CHATGPT_API_KEY", "\"${localProperties["CHATGPT_API_KEY"]}\"")
     }
 
     buildTypes {
@@ -38,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

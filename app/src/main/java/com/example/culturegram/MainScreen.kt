@@ -21,6 +21,10 @@ class MainScreen {
         // 背景色を動的に変更するための状態
         val backgroundColor = remember { mutableStateOf(Color.White) }
 
+        //ChatGPTへのアクセスに必要
+        val coroutineScope = rememberCoroutineScope()
+        val chatGptAccess = ChatGptApiIO()
+
         // メインコンテンツを動的に変更するための変数
         val contentState = remember {
             mutableStateOf<@Composable () -> Unit>({
@@ -59,6 +63,7 @@ class MainScreen {
                     "shorts" -> {
                         contentState.value = { Shorts().Content() }
                         backgroundColor.value = Color.Black
+                        //chatGptAccess.getChatGptResponse("hello world")
                     }
                     "status" -> {
                         contentState.value = { Status().Content(navController) }
@@ -85,7 +90,7 @@ class MainScreen {
                 )
             }
 
-            IconButton(onClick = { onButtonClick("shorts") }) {
+            IconButton(onClick = {onButtonClick("shorts") }) {
                 Icon(
                     imageVector = Icons.Default.Folder,
                     contentDescription = "Shorts Icon",

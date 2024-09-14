@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.culturegram.ui.theme.CultureGramTheme
 import java.io.File
+
 // test_sata
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

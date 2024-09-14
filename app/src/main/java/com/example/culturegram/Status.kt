@@ -393,7 +393,7 @@ class Status {
                     val visited = parts[5].toIntOrNull() == 1
                     println("parts[6] is ")
                     println(parts[6]) // 下の行で設定した値(3)
-                    val evaluation = parts[6].trim().toIntOrNull() ?: 3
+                    val evaluation = parts[6].toIntOrNull() ?: 3
 //                    val evaluation = parts[6].toInt()
 //                    val clear = parts[6].toIntOrNull() ?: 0
 //                    val link = parts[7].toIntOrNull() ?: 0
@@ -452,7 +452,7 @@ class Status {
             csvFile.bufferedWriter().use { writer ->
                 syuzoList.forEach { syuzo ->
                     writer.write(
-                        "${syuzo.id},${syuzo.name},${syuzo.representativeSake},${syuzo.latitude},${syuzo.longitude},${if (syuzo.visited) 1 else 0}, ${syuzo.evaluation}\n"
+                        "${syuzo.id},${syuzo.name},${syuzo.representativeSake},${syuzo.latitude},${syuzo.longitude},${if (syuzo.visited) 1 else 0},${syuzo.evaluation}\n"
                     )
                 }
             }

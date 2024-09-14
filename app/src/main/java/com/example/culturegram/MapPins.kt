@@ -10,7 +10,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 class MapPins {
     //private var heritages: MutableList<SakeBrewery> = mutableListOf()
-    private var SakeBreweries: MutableList<SakeBrewery> = mutableListOf()
+    private var sakeBreweries: MutableList<SakeBrewery> = mutableListOf()
     private var userLatitude: Double = 0.0
     private var userLongitude: Double = 0.0
 
@@ -34,12 +34,12 @@ class MapPins {
     }
 
     fun getSakeBreweries(): MutableList<SakeBrewery> {
-        return SakeBreweries
+        return sakeBreweries
     }
 
     fun getHeritagesInside(distanceLimit: Double): MutableList<SakeBrewery> {
         val result: MutableList<SakeBrewery> = mutableListOf()
-        for (i in SakeBreweries) {
+        for (i in sakeBreweries) {
             if (i.distance <= distanceLimit) result.add(i)
         }
         return result
@@ -47,7 +47,7 @@ class MapPins {
 
     fun readCsvFile(context: Context) {
         try {
-            val inputStream = context.assets.open("syuzo0.csv")
+            val inputStream = context.assets.open("syuzo_full_utf8.csv")
             val reader = BufferedReader(InputStreamReader(inputStream))
             val header = reader.readLine()
             val headerTokens = header.split(",")
@@ -58,8 +58,20 @@ class MapPins {
             val sakeNameIndex = headerTokens.indexOf("代表酒")
             val latitudeIndex = headerTokens.indexOf("緯度")
             val longitudeIndex = headerTokens.indexOf("経度")
-            val yetIndex = headerTokens.indexOf("bool値")
-            val attrIndex = headerTokens.indexOf("属性")
+            val yetIndex = headerTokens.indexOf("既訪")
+
+            // Indices for the attributes (清, 連, 単, ビ, 果, ウ, ス, リ, 他)
+            val attrIndices = listOf(
+                headerTokens.indexOf("清"),
+                headerTokens.indexOf("連"),
+                headerTokens.indexOf("単"),
+                headerTokens.indexOf("ビ"),
+                headerTokens.indexOf("果"),
+                headerTokens.indexOf("ウ"),
+                headerTokens.indexOf("ス"),
+                headerTokens.indexOf("リ"),
+                headerTokens.indexOf("他")
+            )
 
             var line: String?
             while (reader.readLine().also { line = it } != null) {
@@ -72,11 +84,15 @@ class MapPins {
                 val latitude = tokens.getOrNull(latitudeIndex)?.toDoubleOrNull()
                 val longitude = tokens.getOrNull(longitudeIndex)?.toDoubleOrNull()
                 val yet = tokens.getOrNull(yetIndex)?.toIntOrNull()
-                val attr = tokens.getOrNull(attrIndex) // Treat 'attr' as a String
+
+                // Parse attributes
+                val attributes = attrIndices.map { index ->
+                    tokens.getOrNull(index)?.toIntOrNull() ?: 0 // Default to 0 if not found or null
+                }
 
                 // Ensure all values are not null before adding
-                if (id != null && breweryName != null && sakeName != null && latitude != null && longitude != null && yet != null && attr != null) {
-                    SakeBreweries.add(
+                if (id != null && breweryName != null && sakeName != null && latitude != null && longitude != null && yet != null) {
+                    sakeBreweries.add(
                         SakeBrewery(
                             ID = id,
                             breweryName = breweryName,
@@ -85,7 +101,7 @@ class MapPins {
                             longitude = longitude,
                             distance = calculateDistance(latitude, longitude, userLatitude, userLongitude),
                             yet = yet,
-                            attr = attr // Directly assign the 'attr' as a String
+                            attributes = attributes
                         )
                     )
                 }
@@ -95,7 +111,5 @@ class MapPins {
             e.printStackTrace()
         }
     }
-
-
 }
 

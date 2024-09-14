@@ -64,7 +64,7 @@ class Status {
                     modifier = Modifier
 //                            .fillMaxWidth()
                         .padding(16.dp)
-                        .height(150.dp)
+                        .height(250.dp)
                 ) {
                     Row(){
                         DonutChart(achievementRatio, visitedCount, totalCount)
@@ -335,8 +335,9 @@ class Status {
     // 達成度を更新する関数
     private fun updateAchievementStatus(syuzoList: List<Syuzo>, context: Context) {
         syuzoList.forEach { syuzo ->
-            val imagePath = getSavedImagePath(context, syuzo.name)
-            if (imagePath != null && File(imagePath).exists()) {  // 画像が存在する場合にのみカウント
+//            val imagePath = getSavedImagePath(context, syuzo.name)
+            val imagePath = "/storage/emulated/0/Android/data/com.example.culturegram/files/Pictures/${syuzo.name}-0.jpg"
+            if (File(imagePath).exists()) {  // 画像が存在する場合にのみカウント
                 syuzo.visited = true
             } else {
                 syuzo.visited = false  // 画像がない場合は未達成にする

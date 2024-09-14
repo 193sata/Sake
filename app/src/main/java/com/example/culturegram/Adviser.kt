@@ -30,7 +30,8 @@ class Adviser {
 
         // 非同期でChatGPTのレスポンスを取得し、状態を更新
         LaunchedEffect(Unit) {
-            chatGptAccess.getResponse("Hello!") { responseText ->
+            val dSumList =  listOf(1,0,5,3,0,1,2,2,1)
+            chatGptAccess.getAdviserResponse(dSumList) { responseText ->
                 // ChatGPTの返答を受け取ったときに`fullText`を更新
                 println(responseText)
                 fullText = responseText // 動的に変更

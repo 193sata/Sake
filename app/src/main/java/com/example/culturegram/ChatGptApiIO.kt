@@ -38,7 +38,7 @@ class ChatGptApiIO {
         }
     }
 
-    public fun getAdviserResponse(attributes:List<List<Int>>, sumList:List<Int>, maxIndex: Int, callback: (String) -> Unit) {
+    public fun getAdviserResponse(sumList:List<Int>, callback: (String) -> Unit) {
         val coroutineScope = CoroutineScope(Dispatchers.Main) // メインスレッドでコルーチンを起動
         var prompt = "次の数列は順番に[清酒，連続式蒸留焼酎，単式蒸留焼酎，ビール，果実酒，ウィスキー，スピリッツ，リキュール，その他]に分類されるお酒を購入できる製造所に立ち寄った回数を表しています．"
         prompt += sumList.toString() //回数のリストを渡す

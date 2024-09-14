@@ -23,6 +23,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 var selectedImage by remember { mutableStateOf<String?>(null) }
 
+                val chatGptAccess = ChatGptApiIO()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(
                         navController = navController,
